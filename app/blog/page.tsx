@@ -1,43 +1,57 @@
-import Link from "next/link";
+import type { Metadata } from "next";
 import { getPublishedBlogPosts } from "@/lib/blog";
+import { BlogCard } from "@/components/BlogCard";
+import { SITE_URL } from "@/config/site";
+
+export const revalidate = 21600;
+
+export const metadata: Metadata = {
+  title: "Blog Entrepreneuriat — Guides et Conseils pour Artisans",
+  description:
+    "Guides pratiques, démarches administratives et conseils concrets pour créer votre entreprise dans les métiers manuels et du bâtiment.",
+  alternates: { canonical: `${SITE_URL}/blog` },
+  openGraph: {
+    title: "Blog BugeySud Entreprendre — Guides pour Artisans",
+    description:
+      "Guides pratiques pour électriciens, plombiers, peintres et tous les artisans qui veulent créer leur entreprise.",
+    url: `${SITE_URL}/blog`,
+  },
+};
 
 export default async function BlogPage() {
   const posts = await getPublishedBlogPosts(24, 0);
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-12">
-      <header className="mb-8">
-        <p className="text-sm text-slate-500">Blog</p>
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
-          Tous les articles
-        </h1>
-      </header>
-
-      {posts.length === 0 ? (
-        <div className="rounded-lg border border-slate-200 bg-white p-6 text-slate-600">
-          Aucun article publié.
+    <>
+      {/* Page Header */}
+      <div className="page-header">
+        <div className="container">
+          <span className="page-header-tag">Ressources</span>
+          <h1>Blog & Guides pratiques</h1>
+          <p>
+            Démarches, statuts, premiers clients, matériel, facturation…
+            Tout ce qu&apos;il faut savoir pour créer et développer votre
+            entreprise artisanale.
+          </p>
         </div>
-      ) : (
-        <ul className="space-y-4">
-          {posts.map((post) => (
-            <li key={post.id} className="rounded-lg border border-slate-200 bg-white p-5">
-              <h2 className="text-lg font-semibold text-slate-900">
-                <Link href={`/blog/${post.slug}`} className="hover:underline">
-                  {post.h1 || post.seo_title || post.slug}
-                </Link>
-              </h2>
-              {post.meta_description ? (
-                <p className="mt-2 text-slate-600">{post.meta_description}</p>
-              ) : null}
-              <p className="mt-3 text-xs text-slate-500">
-                {post.published_at
-                  ? new Date(post.published_at).toLocaleDateString("fr-FR")
-                  : "Date inconnue"}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </main>
+      </div>
+
+      {/* Articles */}
+      <div className="section">
+        <div className="container">
+          {posts.length === 0 ? (
+            <div className="empty-state">
+              <p>Aucun article publié pour le moment.</p>
+            </div>
+          ) : (
+            <div className="grid-3">
+              {posts.map((post) => (
+                <BlogCard key={post.id} post={post} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 }
